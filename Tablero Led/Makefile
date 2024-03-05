@@ -1,0 +1,19 @@
+# MPLAB IDE generated this makefile for use with GNU make.
+# Project: leds.mcp
+# Date: Wed Nov 20 20:47:04 2019
+
+AS = MPASMWIN.exe
+CC = mcc18.exe
+LD = mplink.exe
+AR = mplib.exe
+RM = rm
+
+leds.cof : leds.o
+	$(LD) /p16F628A "leds.o" /u_DEBUG /z__MPLAB_BUILD=1 /z__MPLAB_DEBUG=1 /o"leds.cof" /M"leds.map" /W
+
+leds.o : leds.asm ../../../../Program\ Files\ (x86)/Microchip/MPASM\ Suite/P16F628.INC
+	$(AS) /q /p16F628A "leds.asm" /l"leds.lst" /e"leds.err" /o"leds.o" /d__DEBUG=1 /c-
+
+clean : 
+	$(RM) "leds.o" "leds.err" "leds.lst" "leds.cof" "leds.hex"
+
