@@ -1,0 +1,54 @@
+MPLINK 4.31, Linker
+Linker Map File - Created Wed Oct 30 14:24:48 2019
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000002
+                   .cinit    romdata   0x000001    program   0x000004
+                   .org_1       code   0x000004    program   0x0000ec
+      .config_2007_LEDS.O       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000002      
+                            0x000004    0x000079      
+                            0x002007    0x002007      
+            122 out of 2183 program addresses used, program memory utilization is 5%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                  BOTONES   0x000045    program     static C:\Users\Matias\Desktop\editado\leds.asm
+                    CONFI   0x00002c    program     static C:\Users\Matias\Desktop\editado\leds.asm
+                DEMORA_AR   0x000066    program     static C:\Users\Matias\Desktop\editado\leds.asm
+                  FIN_T0I   0x000026    program     static C:\Users\Matias\Desktop\editado\leds.asm
+                  LOOP_AR   0x000068    program     static C:\Users\Matias\Desktop\editado\leds.asm
+                LOOP_AR_2   0x00006a    program     static C:\Users\Matias\Desktop\editado\leds.asm
+               MOSTRAR_D2   0x000015    program     static C:\Users\Matias\Desktop\editado\leds.asm
+               MOSTRAR_D3   0x00001b    program     static C:\Users\Matias\Desktop\editado\leds.asm
+               MOSTRAR_D4   0x000021    program     static C:\Users\Matias\Desktop\editado\leds.asm
+              TAB_DISPLAY   0x00006f    program     static C:\Users\Matias\Desktop\editado\leds.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+               MOSTRAR_D2   0x000015    program     static C:\Users\Matias\Desktop\editado\leds.asm
+               MOSTRAR_D3   0x00001b    program     static C:\Users\Matias\Desktop\editado\leds.asm
+               MOSTRAR_D4   0x000021    program     static C:\Users\Matias\Desktop\editado\leds.asm
+                  FIN_T0I   0x000026    program     static C:\Users\Matias\Desktop\editado\leds.asm
+                    CONFI   0x00002c    program     static C:\Users\Matias\Desktop\editado\leds.asm
+                  BOTONES   0x000045    program     static C:\Users\Matias\Desktop\editado\leds.asm
+                DEMORA_AR   0x000066    program     static C:\Users\Matias\Desktop\editado\leds.asm
+                  LOOP_AR   0x000068    program     static C:\Users\Matias\Desktop\editado\leds.asm
+                LOOP_AR_2   0x00006a    program     static C:\Users\Matias\Desktop\editado\leds.asm
+              TAB_DISPLAY   0x00006f    program     static C:\Users\Matias\Desktop\editado\leds.asm
+
+

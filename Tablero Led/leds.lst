@@ -1,0 +1,507 @@
+MPASM  5.31                          LEDS.ASM   10-30-2019  14:24:47         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001         #INCLUDE<P16F628.INC>
+                      00001         LIST
+                      00002 ; P16F628.INC  Standard Header File, Version 1.01    Microchip Technology, Inc.
+Message[301]: MESSAGE: (Processor-header file mismatch.  Verify selected processor.)
+                      00261         LIST
+2007   3F10           00002                 __CONFIG 3F10
+                      00003                 
+                      00004 ;DECLARACION DE ESPACIOS DE MEMORIA A USAR              
+                      00005                 CBLOCK  0X20
+  00000020            00006                 D1
+  00000021            00007                 D2
+  00000022            00008                 D3
+  00000023            00009                 D4
+  00000024            00010                 AUX_W
+  00000025            00011                 AUX_STATUS
+  00000026            00012                 CONT_AR 
+  00000027            00013                 CONT_AR_2
+                      00014                 ENDC            
+                      00015 
+                      00016 ;DECLARACION DE CONSTATNES
+                      00017 #DEFINE BTN_G1  PORTA,6 ;Boton G1
+                      00018 #DEFINE BTN_G2  PORTA,7 ;Boton G2
+                      00019 #DEFINE BTN_R   PORTA,4 ;Boton R
+                      00020 #DEFINE BTN_M   PORTB,0 ;Boton M
+                      00021 
+                      00022 #DEFINE PIN_D1  3
+                      00023 #DEFINE PIN_D2  2
+                      00024 #DEFINE PIN_D3  0
+                      00025 #DEFINE PIN_D4  1
+                      00026 
+                      00027 #DEFINE CTRL_DISPLAY    PORTA
+                      00028 #DEFINE APAGAR_DISPLAYS CLRF    PORTA
+                      00029 
+                      00030 ;DECLARACION DE MACROS
+                      00031 
+                      00032 MOSTRAR MACRO   DIGITO,PIN
+                      00033                 APAGAR_DISPLAYS
+                      00034                 MOVF    DIGITO,W
+                      00035                 CALL    TAB_DISPLAY
+                      00036                 MOVWF   PORTB
+                      00037                 BSF             CTRL_DISPLAY,PIN
+                      00038                 ENDM
+                      00039 
+                      00040 SUMAR   MACRO   DIGITO
+                      00041                 INCF    DIGITO,1
+                      00042                 MOVF    DIGITO,W
+                      00043                 XORLW   .10
+                      00044                 BTFSC   STATUS,Z
+                      00045                 CLRF    DIGITO
+                      00046                 ENDM
+                      00047 
+                      00048 RESTAR  MACRO   DIGITO
+                      00049                 DECF    DIGITO,1
+MPASM  5.31                          LEDS.ASM   10-30-2019  14:24:47         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00050                 MOVF    DIGITO,W
+                      00051                 XORLW   .10
+                      00052                 BTFSC   STATUS,Z
+                      00053                 CLRF    DIGITO
+                      00054                 ENDM
+                      00055 ;---------------------------------------------------------------------------------------;
+                      00056 
+                      00057 
+                      00058 ;INICIO DEL PROGRAMA            
+                      00059                 
+                      00060                 ORG             0X00
+0000   2???           00061                 GOTO    CONFI
+                      00062                 ORG             0X04            
+                      00063 
+                      00064 ;RUTINA DE INTERRUPCION
+                      00065 ;DESBORDA EL TIMER CADA 5ms
+                      00066 ;MUESTRA TODOS LOS DIGITOS DE ACUERDO A LAS VARIABLES D1:4
+                      00067 
+                      00068 ;GUARDA STATUS Y W EN VARIABLES AUXILIARES
+0004   110B           00069                 BCF             INTCON,T0IF
+0005   138B           00070                 BCF             INTCON,GIE              
+0006   00A4           00071                 MOVWF   AUX_W
+0007   3003           00072                 MOVLW   STATUS
+0008   00A5           00073                 MOVWF   AUX_STATUS
+                      00074 ;MULTIPLEXADO DE DISPLAYS
+0009   1985           00075                 BTFSC   CTRL_DISPLAY,PIN_D1
+000A   2???           00076                 GOTO    MOSTRAR_D2                      
+000B   1905           00077                 BTFSC   CTRL_DISPLAY,PIN_D2
+000C   2???           00078                 GOTO    MOSTRAR_D3
+000D   1805           00079                 BTFSC   CTRL_DISPLAY,PIN_D3
+000E   2???           00080                 GOTO    MOSTRAR_D4
+                      00081                 
+                      00082                 MOSTRAR D1,PIN_D1
+000F   0185               M                 APAGAR_DISPLAYS
+0010   0820               M                 MOVF    D1,W
+0011   2???               M                 CALL    TAB_DISPLAY
+0012   0086               M                 MOVWF   PORTB
+0013   1585               M                 BSF             CTRL_DISPLAY,3
+0014   2???           00083                 GOTO    FIN_T0I
+                      00084 
+0015                  00085 MOSTRAR_D2
+                      00086                 MOSTRAR D2,PIN_D2
+0015   0185               M                 APAGAR_DISPLAYS
+0016   0821               M                 MOVF    D2,W
+0017   2???               M                 CALL    TAB_DISPLAY
+0018   0086               M                 MOVWF   PORTB
+0019   1505               M                 BSF             CTRL_DISPLAY,2
+001A   2???           00087                 GOTO    FIN_T0I
+                      00088 
+001B                  00089 MOSTRAR_D3
+                      00090                 MOSTRAR D3,PIN_D3
+001B   0185               M                 APAGAR_DISPLAYS
+001C   0822               M                 MOVF    D3,W
+MPASM  5.31                          LEDS.ASM   10-30-2019  14:24:47         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+001D   2???               M                 CALL    TAB_DISPLAY
+001E   0086               M                 MOVWF   PORTB
+001F   1405               M                 BSF             CTRL_DISPLAY,0
+0020   2???           00091                 GOTO    FIN_T0I
+                      00092 
+0021                  00093 MOSTRAR_D4
+                      00094                 MOSTRAR D4,PIN_D4
+0021   0185               M                 APAGAR_DISPLAYS
+0022   0823               M                 MOVF    D4,W
+0023   2???               M                 CALL    TAB_DISPLAY
+0024   0086               M                 MOVWF   PORTB
+0025   1485               M                 BSF             CTRL_DISPLAY,1
+                      00095                 
+0026                  00096 FIN_T0I
+                      00097 ;REINICIA TIMER Y RECUPERA STATUS Y W
+0026   30EC           00098                 MOVLW   .236
+0027   0081           00099                 MOVWF   TMR0
+0028   0825           00100                 MOVF    AUX_STATUS,W
+0029   0083           00101                 MOVWF   STATUS
+002A   0824           00102                 MOVF    AUX_W,W
+002B   0009           00103                 RETFIE
+                      00104 
+                      00105 ;CONFIGURACION
+                      00106                 
+002C                  00107 CONFI
+002C   3007           00108                 MOVLW   0X07
+002D   009F           00109                 MOVWF   CMCON; CMCON SE TIENE QUE ESTABLECER EN 7 PARA USAR TODO EL PORTA
+002E   30EC           00110                 MOVLW   .236
+002F   0081           00111                 MOVWF   TMR0
+0030   1683           00112                 BSF             STATUS,RP0
+0031   3001           00113                 MOVLW   B'00000001'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0032   0086           00114                 MOVWF   TRISB   
+0033   30F0           00115                 MOVLW   B'11110000'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0034   0085           00116                 MOVWF   TRISA
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0035   1281           00117                 BCF             OPTION_REG,T0CS
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0036   1181           00118                 BCF             OPTION_REG,PSA
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0037   1401           00119                 BSF             OPTION_REG,PS0
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0038   1481           00120                 BSF             OPTION_REG,PS1
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0039   1501           00121                 BSF             OPTION_REG,PS2
+003A   178B           00122                 BSF             INTCON,GIE
+003B   168B           00123                 BSF             INTCON,T0IE
+003C   1283           00124                 BCF             STATUS,RP0
+                      00125 
+                      00126 ;RUTINA PRINCIPAL
+                      00127 ;INCREMENTA DE 0 A 9 CADA DIGITO DEPENDIENDO QUE BOT?N SE TOCA. 
+                      00128 
+MPASM  5.31                          LEDS.ASM   10-30-2019  14:24:47         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+003D   0185           00129                 CLRF    PORTA
+003E   0186           00130                 CLRF    PORTB
+                      00131 
+                      00132                 ; D1-4 display
+                      00133 
+003F   01A0           00134                 CLRF    D1 
+                      00135                 ;CLRF   D2
+                      00136                 ;CLRF   D3
+0040   01A3           00137                 CLRF    D4
+                      00138 
+                      00139 ;INICIAR DISPLAY 3-----------
+                      00140 
+0041   3003           00141                 MOVLW   .3
+0042   00A2           00142                 MOVWF   D3 
+                      00143 
+                      00144 ;INICIAR DISPLAY 2-----------
+                      00145 
+0043   3002           00146                 MOVLW   .2
+0044   00A1           00147                 MOVWF   D2 
+                      00148 
+                      00149 
+0045                  00150 BOTONES
+0045   1B05           00151                 BTFSC   BTN_G1
+0046   2???           00152                 CALL    DEMORA_AR
+0047   1B05           00153                 BTFSC   BTN_G1
+                      00154                 SUMAR   D4
+0048   0AA3               M                 INCF    D4,1
+0049   0823               M                 MOVF    D4,W
+004A   3A0A               M                 XORLW   .10
+004B   1903               M                 BTFSC   STATUS,Z
+004C   01A3               M                 CLRF    D4
+004D   1B85           00155                 BTFSC   BTN_G2
+004E   2???           00156                 CALL    DEMORA_AR
+004F   1B85           00157                 BTFSC   BTN_G2
+                      00158                 RESTAR  D4
+0050   03A3               M                 DECF    D4,1
+0051   0823               M                 MOVF    D4,W
+0052   3A0A               M                 XORLW   .10
+0053   1903               M                 BTFSC   STATUS,Z
+0054   01A3               M                 CLRF    D4
+0055   1A05           00159                 BTFSC   BTN_R
+0056   2???           00160                 CALL    DEMORA_AR
+0057   1A05           00161                 BTFSC   BTN_R
+                      00162                 SUMAR   D2
+0058   0AA1               M                 INCF    D2,1
+0059   0821               M                 MOVF    D2,W
+005A   3A0A               M                 XORLW   .10
+005B   1903               M                 BTFSC   STATUS,Z
+005C   01A1               M                 CLRF    D2
+005D   1806           00163                 BTFSC   BTN_M
+005E   2???           00164                 CALL    DEMORA_AR
+005F   1806           00165                 BTFSC   BTN_M
+                      00166                 SUMAR   D1
+MPASM  5.31                          LEDS.ASM   10-30-2019  14:24:47         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0060   0AA0               M                 INCF    D1,1
+0061   0820               M                 MOVF    D1,W
+0062   3A0A               M                 XORLW   .10
+0063   1903               M                 BTFSC   STATUS,Z
+0064   01A0               M                 CLRF    D1
+0065   2???           00167                 GOTO    BOTONES
+                      00168 
+                      00169 
+0066                  00170 DEMORA_AR
+0066   30FF           00171                 MOVLW   .255
+0067   00A6           00172                 MOVWF   CONT_AR
+0068                  00173 LOOP_AR
+0068   30FF           00174                 MOVLW   .255
+0069   00A7           00175                 MOVWF   CONT_AR_2
+006A                  00176 LOOP_AR_2
+006A   0BA7           00177                 DECFSZ  CONT_AR_2,1
+006B   2???           00178                 GOTO    LOOP_AR_2
+006C   0BA6           00179                 DECFSZ  CONT_AR,1
+006D   2???           00180                 GOTO    LOOP_AR
+006E   0008           00181                 RETURN
+                      00182                         
+                      00183 ;CONVERSOR A DISPLAY
+                      00184 ;RB1->SEG A
+                      00185 ;RB2->SEG B 
+                      00186 ;RB3->SEG C
+                      00187 ;RB4->SEG D
+                      00188 ;RB5->SEG E 
+                      00189 ;RB6->SEG F
+                      00190 ;RB7->SEG G
+                      00191 
+006F                  00192 TAB_DISPLAY
+006F   0782           00193                 ADDWF   PCL,1
+                      00194                 ;         GFEDCBA-
+0070   347F           00195                 RETLW   B'01111111'     
+0071   340D           00196                 RETLW   B'00001101'
+0072   34B7           00197                 RETLW   B'10110111'
+0073   349F           00198                 RETLW   B'10011111'
+0074   34CD           00199                 RETLW   B'11001101'
+0075   34DB           00200                 RETLW   B'11011011'
+0076   34FB           00201                 RETLW   B'11111011'
+0077   340F           00202                 RETLW   B'00001111'
+0078   34FF           00203                 RETLW   B'11111111'
+0079   34CF           00204                 RETLW   B'11001111'
+                      00205                 
+3F10                  00206                 END
+MPASM  5.31                          LEDS.ASM   10-30-2019  14:24:47         PAGE  6
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ADEN                              00000003
+APAGAR_DISPLAYS                   CLRF    PORTA
+AUX_STATUS                        00000025
+AUX_W                             00000024
+BOTONES                           00000045
+BRGH                              00000002
+BTN_G1                            PORTA,6
+BTN_G2                            PORTA,7
+BTN_M                             PORTB,0
+BTN_R                             PORTA,4
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCPR1H                            00000016
+CCPR1L                            00000015
+CIS                               00000003
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000001F
+CMIE                              00000006
+CMIF                              00000006
+CONFI                             0000002C
+CONT_AR                           00000026
+CONT_AR_2                         00000027
+CREN                              00000004
+CSRC                              00000007
+CTRL_DISPLAY                      PORTA
+D1                                00000020
+D2                                00000021
+D3                                00000022
+D4                                00000023
+DC                                00000001
+DEMORA_AR                         00000066
+EEADR                             0000009B
+EECON1                            0000009C
+EECON2                            0000009D
+EEDATA                            0000009A
+EEIE                              00000007
+EEIF                              00000007
+F                                 00000001
+FERR                              00000002
+MPASM  5.31                          LEDS.ASM   10-30-2019  14:24:47         PAGE  7
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+FIN_T0I                           00000026
+FSR                               00000004
+GIE                               00000007
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+LOOP_AR                           00000068
+LOOP_AR_2                         0000006A
+MOSTRAR                           
+MOSTRAR_D2                        00000015
+MOSTRAR_D3                        0000001B
+MOSTRAR_D4                        00000021
+NOT_BO                            00000000
+NOT_BOD                           00000000
+NOT_BOR                           00000000
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+OERR                              00000001
+OPTION_REG                        00000081
+OSCF                              00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PIE1                              0000008C
+PIN_D1                            3
+PIN_D2                            2
+PIN_D3                            0
+PIN_D4                            1
+PIR1                              0000000C
+PORTA                             00000005
+PORTB                             00000006
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RBIE                              00000003
+RBIF                              00000000
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RESTAR                            
+RP0                               00000005
+RP1                               00000006
+MPASM  5.31                          LEDS.ASM   10-30-2019  14:24:47         PAGE  8
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RX9                               00000006
+RX9D                              00000000
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+STATUS                            00000003
+SUMAR                             
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1OSCEN                           00000003
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TAB_DISPLAY                       0000006F
+TMR0                              00000001
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISB                             00000086
+TRMT                              00000001
+TX9                               00000006
+TX9D                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+VR0                               00000000
+VR1                               00000001
+VR2                               00000002
+VR3                               00000003
+VRCON                             0000009F
+VREN                              00000007
+VROE                              00000006
+VRR                               00000005
+MPASM  5.31                          LEDS.ASM   10-30-2019  14:24:47         PAGE  9
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+W                                 00000000
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_CP_50                            00002BFF
+_CP_75                            000017FF
+_CP_ALL                           000003FF
+_CP_OFF                           00003FFF
+_DATA_CP_OFF                      00003FFF
+_DATA_CP_ON                       00003EFF
+_ER_OSC_CLKOUT                    00003FFF
+_ER_OSC_NOCLKOUT                  00003FFE
+_EXTCLK_OSC                       00003FEF
+_HS_OSC                           00003FEE
+_INTRC_OSC_CLKOUT                 00003FFD
+_INTRC_OSC_NOCLKOUT               00003FFC
+_LP_OSC                           00003FEC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_MCLRE_OFF                        00003FDF
+_MCLRE_ON                         00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FED
+__16F628A                         00000001
+__DEBUG                           1
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :     8 reported,     0 suppressed
+
+
